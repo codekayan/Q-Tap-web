@@ -1,5 +1,5 @@
 "use client";
-import { ordersDetails } from '@/app/[locale]/categories/data';
+// import { ordersDetails } from '@/app/[locale]/categories/data';
 import { formateDate } from '@/utils/utils';
 import { Box, Typography, Divider, Grid } from '@mui/material';
 import { useTranslations } from 'next-intl';

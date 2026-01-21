@@ -1,15 +1,34 @@
 // next.config.mjs
 import createNextIntlPlugin from 'next-intl/plugin';
-const withNextIntl = createNextIntlPlugin();  // or './i18n.ts'
+
+const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  // other options
-  turbopack: {
-    // في بيئة ES Module لا يوجد __dirname، نستخدم process.cwd()
-    root: process.cwd()
-  }
+  
+  // إزالة swcMinify لأنه تلقائي في Next.js 15
+  // إزالة turbopack من المستوى الأعلى
+  
+  images: {
+    domains: ['localhost'],
+    unoptimized: process.env.NODE_ENV === 'development',
+  },
+  
+  reactStrictMode: true,
+  
+  // compiler options بدلاً من swcMinify
+  compiler: {
+    // removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // إعدادات تجريبية (اختياري)
+  experimental: {
+    // turbo: {} // فقط إذا كنت تستخدم turbopack
+  },
+  
+  // لتحسين الأداء
+  compress: true,
 };
 
 export default withNextIntl(nextConfig);

@@ -1,19 +1,19 @@
 import localFont from "next/font/local";
-import "./globals.css";
-import HomeContextProvider from "./context/homeContext.js";
+import "./[locale]/globals.css";
+import HomeContextProvider from "./[locale]/context/homeContext.js";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { routing } from "@/i18n/routing";
-import PusherProvider from "./context/PusherProvider";
+import PusherProvider from "./[locale]/context/PusherProvider";
 import { ToastContainer } from "react-toastify";
 import ClientProviders from "@/component/ClientProviders/ClientProviders";
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
+  src: "./[locale]/fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
+  src: "./[locale]/fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
 });

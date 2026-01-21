@@ -9,7 +9,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
-import done from '/src/animation/done.json';
+import done from '@/animation/done.json';
 import { Link } from "@/i18n/navigation"
 import { useTranslations } from 'next-intl';
 
