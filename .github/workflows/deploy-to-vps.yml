@@ -6,9 +6,45 @@ on:
       - main
 
 jobs:
-  deploy:
+  # ═══════════════════════════════════════════════════════════════
+  # STAGE 1: Validate - Catch errors early before wasting time
+  # ═══════════════════════════════════════════════════════════════
+  validate:
+    name: 🔍 Validate Code
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate JSON files
+        run: |
+          echo "🔍 Validating JSON files..."
+          for file in messages/*.json; do
+            echo "  Checking $file"
+            node -e "JSON.parse(require('fs').readFileSync('$file', 'utf8'))" || exit 1
+          done
+          echo "✅ All JSON files are valid!"
+
+      - name: Install dependencies
+        run: |
+          rm -f package-lock.json
+          npm install --force
+
+      - name: Lint check
+        run: npm run lint || echo "⚠️ Lint warnings found (non-blocking)"
+
+  # ═══════════════════════════════════════════════════════════════
+  # STAGE 2: Build - Create production build
+  # ═══════════════════════════════════════════════════════════════
+  build:
+    name: 🔨 Build
+    runs-on: ubuntu-latest
+    needs: validate
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,11 +65,25 @@ jobs:
       - name: Archive build files
         run: tar -czf build.tar.gz .next public package.json package-lock.json next.config.mjs messages
 
-      - name: 🔍 Debug - Check secrets are set
-        run: |
-          if [ -z "${{ secrets.VPS_HOST }}" ]; then echo "❌ VPS_HOST is empty!"; else echo "✅ VPS_HOST is set"; fi
-          if [ -z "${{ secrets.VPS_USER }}" ]; then echo "❌ VPS_USER is empty!"; else echo "✅ VPS_USER is set"; fi
-          if [ -z "${{ secrets.VPS_SSH_PRIVATE_KEY }}" ]; then echo "❌ VPS_SSH_PRIVATE_KEY is empty!"; else echo "✅ VPS_SSH_PRIVATE_KEY is set"; fi
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build.tar.gz
+          retention-days: 1
+
+  # ═══════════════════════════════════════════════════════════════
+  # STAGE 3: Deploy - Send to production server
+  # ═══════════════════════════════════════════════════════════════
+  deploy:
+    name: 🚀 Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
 
       - name: 🔑 Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
