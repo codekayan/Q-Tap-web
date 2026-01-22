@@ -5,9 +5,6 @@ on:
     branches: [main, master]
 
 jobs:
-  # ═══════════════════════════════════════════════════════════════
-  # Build on GitHub Actions (sharp works here)
-  # ═══════════════════════════════════════════════════════════════
   build-and-deploy:
     name: 🔨 Build & 🚀 Deploy
     runs-on: ubuntu-latest
@@ -31,41 +28,30 @@ jobs:
 
       - name: Create deployment package
         run: |
-          tar -czf deploy.tar.gz .next public package.json package-lock.json next.config.mjs messages node_modules
+          tar -czf deploy.tar.gz .next public package.json next.config.mjs messages
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
+          ssh-private-key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Upload and deploy
+        run: |
+          scp deploy.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy.tar.gz
+          
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd /var/www/Q-Tap-web
-            rm -rf .next node_modules
-
-      - name: Copy files to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          port: 22
-          source: "deploy.tar.gz"
-          target: "/var/www/Q-Tap-web"
-
-      - name: Extract and restart
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            cd /var/www/Q-Tap-web
-            tar -xzf deploy.tar.gz
-            rm deploy.tar.gz
+            rm -rf .next public
+            tar -xzf /tmp/deploy.tar.gz
+            rm /tmp/deploy.tar.gz
+            npm install --production --force
             pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
             pm2 save
             sudo nginx -t && sudo systemctl reload nginx
             echo "✅ Deployed!"
+          EOF
