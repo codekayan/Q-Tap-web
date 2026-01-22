@@ -45,34 +45,14 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           port: 22
-          command_timeout: 30m
           script: |
-            set -e
             cd /var/www/Q-Tap-web
-            
-            echo "👉 Fetching latest code..."
             git fetch origin
             git reset --hard origin/main
-            
-            echo "👉 Cleaning everything..."
-            rm -rf .next
-            rm -rf node_modules
             rm -f package-lock.json
-            npm cache clean --force
-            
-            echo "👉 Installing dependencies (fresh)..."
             npm install --force
-            
-            echo "👉 Building Next.js app..."
             npm run build
-            
-            echo "👉 Restarting PM2..."
-            pm2 stop qtap-frontend 2>/dev/null || true
-            pm2 delete qtap-frontend 2>/dev/null || true
-            pm2 start npm --name "qtap-frontend" -- run start
+            pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
             pm2 save
-            
-            echo "👉 Reloading Nginx..."
             sudo nginx -t && sudo systemctl reload nginx
-            
-            echo "✅ Deployed successfully!"
+            echo "✅ Deployed!"
