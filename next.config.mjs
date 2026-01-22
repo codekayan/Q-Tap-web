@@ -7,28 +7,27 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig = {
   output: 'standalone',
   
-  // إزالة swcMinify لأنه تلقائي في Next.js 15
-  // إزالة turbopack من المستوى الأعلى
-  
   images: {
     domains: ['localhost'],
-    unoptimized: true, // REQUIRED: Server CPU doesn't support sharp
+    unoptimized: true,
   },
   
   reactStrictMode: true,
-  
-  // compiler options بدلاً من swcMinify
-  compiler: {
-    // removeConsole: process.env.NODE_ENV === 'production',
-  },
-  
-  // إعدادات تجريبية (اختياري)
-  experimental: {
-    // turbo: {} // فقط إذا كنت تستخدم turbopack
-  },
-  
-  // لتحسين الأداء
   compress: true,
+  
+  // Fix leaflet images - bypass sharp completely
+  webpack: (config, { isServer }) => {
+    // Handle image files without sharp
+    config.module.rules.push({
+      test: /\.(png|jpg|jpeg|gif|webp|svg)$/i,
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/media/[name].[hash][ext]',
+      },
+    });
+    
+    return config;
+  },
 };
 
 export default withNextIntl(nextConfig);
