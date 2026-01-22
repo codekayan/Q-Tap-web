@@ -49,7 +49,7 @@ jobs:
             cd /var/www/Q-Tap-web
             git fetch origin
             git reset --hard origin/main
-            rm -f package-lock.json
+            rm -rf .next node_modules package-lock.json
             npm install --force
             npm run build
             pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
