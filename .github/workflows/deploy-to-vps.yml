@@ -46,15 +46,16 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            set -e
             cd /var/www/Q-Tap-web
             
             echo "👉 Fetching latest code..."
             git fetch origin
             git reset --hard origin/main
             
-            echo "👉 Cleaning old build..."
+            echo "👉 Cleaning old build and node_modules..."
             rm -rf .next
-            rm -rf node_modules/.cache
+            rm -rf node_modules
             rm -f package-lock.json
             
             echo "👉 Installing dependencies..."
@@ -64,8 +65,8 @@ jobs:
             npm run build
             
             echo "👉 Restarting PM2..."
-            pm2 stop qtap-frontend || true
-            pm2 delete qtap-frontend || true
+            pm2 stop qtap-frontend 2>/dev/null || true
+            pm2 delete qtap-frontend 2>/dev/null || true
             pm2 start npm --name "qtap-frontend" -- run start
             pm2 save
             
