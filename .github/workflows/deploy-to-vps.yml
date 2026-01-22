@@ -1,16 +1,14 @@
-name: CI/CD Pipeline
+name: Deploy to VPS
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
-  build-and-deploy:
-    name: 🔨 Build & 🚀 Deploy
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -18,40 +16,25 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install & Build
         run: |
-          rm -f package-lock.json
           npm install --force
+          npm run build
 
-      - name: Build Next.js app
-        run: npm run build
-
-      - name: Create deployment package
-        run: |
-          tar -czf deploy.tar.gz .next public package.json next.config.mjs messages
-
-      - name: Setup SSH Key
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-
-      - name: Add server to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Upload and deploy
-        run: |
-          scp deploy.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy.tar.gz
-          
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
             cd /var/www/Q-Tap-web
-            rm -rf .next public
-            tar -xzf /tmp/deploy.tar.gz
-            rm /tmp/deploy.tar.gz
-            npm install --production --force
+            git fetch origin
+            git reset --hard origin/main
+            npm install --force
+            npm run build
             pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
             pm2 save
-            sudo nginx -t && sudo systemctl reload nginx
-            echo "✅ Deployed!"
-          EOF
+            sudo systemctl reload nginx
+            echo "✅ Done!"

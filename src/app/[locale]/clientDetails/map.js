@@ -4,15 +4,13 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-// Fix Leaflet's marker icons
+
+// Fix Leaflet's marker icons - use CDN instead of imports (avoids sharp/webpack issues)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: markerIcon2x.src,
-    iconUrl: markerIcon.src,
-    shadowUrl: markerShadow.src,
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 // Component to handle map clicks
 function LocationMarker({ onSelect, defaultPos = null }) {
