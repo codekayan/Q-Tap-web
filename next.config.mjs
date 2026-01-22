@@ -12,7 +12,7 @@ const nextConfig = {
   
   images: {
     domains: ['localhost'],
-    unoptimized: process.env.NODE_ENV === 'development',
+    unoptimized: true, // REQUIRED: Server CPU doesn't support sharp
   },
   
   reactStrictMode: true,
