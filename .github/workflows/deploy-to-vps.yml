@@ -46,8 +46,9 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /var/www/Q-tap-Website
-            git pull origin main || git pull origin master
+            cd /var/www/Q-Tap-web
+            git fetch origin
+            git reset --hard origin/main
             rm -f package-lock.json
             npm install --force
             npm run build
