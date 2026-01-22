@@ -54,14 +54,17 @@ jobs:
               APP_PATH="/var/www/Q-tap-Website"
               ARCHIVE_NAME="build.tar.gz"
 
+              echo "👉 Creating directory if not exists"
+              mkdir -p $APP_PATH
+
               echo "👉 Extracting build to $APP_PATH"
               cd $APP_PATH
-              rm -rf .next
+              rm -rf .next public package.json package-lock.json next.config.mjs messages
               tar -xzf /tmp/$ARCHIVE_NAME -C $APP_PATH
               rm /tmp/$ARCHIVE_NAME
 
               echo "👉 Installing production dependencies"
-              npm install --production
+              npm install --production --force
 
               echo "👉 Restarting PM2 process"
               pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
