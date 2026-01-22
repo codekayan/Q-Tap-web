@@ -47,12 +47,29 @@ jobs:
           port: 22
           script: |
             cd /var/www/Q-Tap-web
+            
+            echo "👉 Fetching latest code..."
             git fetch origin
             git reset --hard origin/main
+            
+            echo "👉 Cleaning old build..."
+            rm -rf .next
+            rm -rf node_modules/.cache
             rm -f package-lock.json
+            
+            echo "👉 Installing dependencies..."
             npm install --force
+            
+            echo "👉 Building Next.js app..."
             npm run build
-            pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
+            
+            echo "👉 Restarting PM2..."
+            pm2 stop qtap-frontend || true
+            pm2 delete qtap-frontend || true
+            pm2 start npm --name "qtap-frontend" -- run start
             pm2 save
+            
+            echo "👉 Reloading Nginx..."
             sudo nginx -t && sudo systemctl reload nginx
-            echo "✅ Deployed!"
+            
+            echo "✅ Deployed successfully!"
