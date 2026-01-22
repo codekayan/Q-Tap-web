@@ -1,13 +1,12 @@
-name: Deploy Next.js to VPS
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, master]
 
 jobs:
   # ═══════════════════════════════════════════════════════════════
-  # STAGE 1: Validate - Catch errors early before wasting time
+  # STAGE 1: Validate - Catch errors early
   # ═══════════════════════════════════════════════════════════════
   validate:
     name: 🔍 Validate Code
@@ -30,89 +29,29 @@ jobs:
           done
           echo "✅ All JSON files are valid!"
 
-      - name: Install dependencies
-        run: |
-          rm -f package-lock.json
-          npm install --force
-
-      - name: Lint check
-        run: npm run lint || echo "⚠️ Lint warnings found (non-blocking)"
-
   # ═══════════════════════════════════════════════════════════════
-  # STAGE 2: Build Test - Verify build works before deploying
-  # ═══════════════════════════════════════════════════════════════
-  build:
-    name: 🔨 Build Test
-    runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: |
-          rm -f package-lock.json
-          npm install --force
-
-      - name: Build Next.js app
-        run: npm run build
-
-  # ═══════════════════════════════════════════════════════════════
-  # STAGE 3: Deploy - Pull and build on server
+  # STAGE 2: Deploy to VPS
   # ═══════════════════════════════════════════════════════════════
   deploy:
     name: 🚀 Deploy to VPS
     runs-on: ubuntu-latest
-    needs: build
+    needs: validate
+
     steps:
-      - name: 🔑 Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-
-      - name: 🧩 Add server to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-
-      - name: 🚀 Deploy to VPS
-        run: |
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-              set -e
-              APP_PATH="/var/www/Q-tap-Website"
-
-              echo "👉 Creating directory if not exists"
-              mkdir -p $APP_PATH
-              cd $APP_PATH
-
-              echo "👉 Checking if git repo exists"
-              if [ ! -d ".git" ]; then
-                  echo "👉 Cloning repository..."
-                  git clone https://github.com/codekayan/Q-Tap-web.git .
-              else
-                  echo "👉 Pulling latest changes..."
-                  git fetch origin
-                  git reset --hard origin/main
-              fi
-
-              echo "👉 Installing dependencies"
-              rm -f package-lock.json
-              npm install --force
-
-              echo "👉 Building Next.js app"
-              npm run build
-
-              echo "👉 Restarting PM2 process"
-              pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
-              pm2 save
-              
-              echo "👉 Reloading Nginx"
-              sudo nginx -t && sudo systemctl reload nginx
-              
-              echo "✅ Deployment complete!"
-          EOF
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /var/www/Q-tap-Website
+            git pull origin main || git pull origin master
+            rm -f package-lock.json
+            npm install --force
+            npm run build
+            pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
+            pm2 save
+            sudo nginx -t && sudo systemctl reload nginx
+            echo "✅ Deployed!"
