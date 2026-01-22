@@ -39,10 +39,10 @@ jobs:
         run: npm run lint || echo "⚠️ Lint warnings found (non-blocking)"
 
   # ═══════════════════════════════════════════════════════════════
-  # STAGE 2: Build - Create production build
+  # STAGE 2: Build Test - Verify build works before deploying
   # ═══════════════════════════════════════════════════════════════
   build:
-    name: 🔨 Build
+    name: 🔨 Build Test
     runs-on: ubuntu-latest
     needs: validate
     steps:
@@ -62,29 +62,14 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
-      - name: Archive build files
-        run: tar -czf build.tar.gz .next public package.json package-lock.json next.config.mjs messages
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifact
-          path: build.tar.gz
-          retention-days: 1
-
   # ═══════════════════════════════════════════════════════════════
-  # STAGE 3: Deploy - Send to production server
+  # STAGE 3: Deploy - Pull and build on server
   # ═══════════════════════════════════════════════════════════════
   deploy:
     name: 🚀 Deploy to VPS
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifact
-
       - name: 🔑 Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -97,24 +82,30 @@ jobs:
 
       - name: 🚀 Deploy to VPS
         run: |
-          scp build.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/
-
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
               set -e
               APP_PATH="/var/www/Q-tap-Website"
-              ARCHIVE_NAME="build.tar.gz"
 
               echo "👉 Creating directory if not exists"
               mkdir -p $APP_PATH
-
-              echo "👉 Extracting build to $APP_PATH"
               cd $APP_PATH
-              rm -rf .next public package.json package-lock.json next.config.mjs messages
-              tar -xzf /tmp/$ARCHIVE_NAME -C $APP_PATH
-              rm /tmp/$ARCHIVE_NAME
 
-              echo "👉 Installing production dependencies"
-              npm install --production --force
+              echo "👉 Checking if git repo exists"
+              if [ ! -d ".git" ]; then
+                  echo "👉 Cloning repository..."
+                  git clone https://github.com/codekayan/Q-Tap-web.git .
+              else
+                  echo "👉 Pulling latest changes..."
+                  git fetch origin
+                  git reset --hard origin/main
+              fi
+
+              echo "👉 Installing dependencies"
+              rm -f package-lock.json
+              npm install --force
+
+              echo "👉 Building Next.js app"
+              npm run build
 
               echo "👉 Restarting PM2 process"
               pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
