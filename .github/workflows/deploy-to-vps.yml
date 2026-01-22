@@ -8,19 +8,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install & Build
-        run: |
-          npm install --force
-          npm run build
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -34,7 +21,5 @@ jobs:
             git reset --hard origin/main
             npm install --force
             npm run build
-            pm2 restart qtap-frontend || pm2 start npm --name "qtap-frontend" -- run start
-            pm2 save
-            sudo systemctl reload nginx
-            echo "✅ Done!"
+            pm2 restart qtap-frontend
+            echo "✅ Deployed!"
