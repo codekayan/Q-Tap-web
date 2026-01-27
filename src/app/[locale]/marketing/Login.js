@@ -12,7 +12,7 @@ import {
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { AllChatForm } from '../Chat/AllChatForm.js';
 import axios from 'axios';
 import { useLocale, useTranslations } from 'next-intl';

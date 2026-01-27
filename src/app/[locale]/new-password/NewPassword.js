@@ -10,7 +10,7 @@ import { InputAdornment, OutlinedInput, FormControl } from '@mui/material'
 import ArrowRightOutlinedIcon from '@mui/icons-material/ArrowRightOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { Mail } from '@mui/icons-material';
 import { BASE_URL } from '@/utils/constants';
 import axios from 'axios';

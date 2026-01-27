@@ -4,7 +4,7 @@ import { Box, Divider, IconButton, Typography } from '@mui/material';
 import { Link } from "@/i18n/navigation"
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 
 
 export const Header = () => {

@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { BASE_URL } from '@/utils/constants';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 
 export const ReceiveOtp = () => {
     const t = useTranslations()

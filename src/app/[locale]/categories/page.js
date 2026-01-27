@@ -345,46 +345,43 @@ const CategoryView = ({
           <div
             key={item.id}
             className="menu-item"
-            style={{ backgroundImage: `url(${BASE_URL_IMAGE}${item.cover})` }}
+            style={{ backgroundImage: `url(${BASE_URL_IMAGE}${item.cover})`, cursor: "pointer" }}
+            onClick={() => {
+              handlCatClick(item.id);
+            }}
+            onMouseEnter={() => {
+              prefetchTarget(item.id);
+            }}
           >
-            <Button
-              sx={{ width: "100%", height: "100%" }}
-              onClick={() => {
-                handlCatClick(item.id);
+            <div className="overlay">
+              <Typography className="menu-title">{item.name}</Typography>
+            </div>
+
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
               }}
-              onMouseEnter={() => {
-                prefetchTarget(item.id);
+              style={{
+                backgroundImage: "linear-gradient(to right, #48485B, #797993)",
+                width: "30px",
+                height: "30px",
+                padding: "0px",
+                margin: "0px",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                position: "absolute",
+                bottom: "0",
+                right: "0",
               }}
             >
-              <div className="overlay">
-                <Typography className="menu-title">{item.name}</Typography>
-              </div>
-
-              <Button
-                sx={{
-                  backgroundImage:
-                    "linear-gradient(to right, #48485B, #797993)",
-                  width: "30px",
-                  height: "30px",
-                  padding: "0px",
-                  margin: "0px",
-                  minWidth: "0px",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  position: "absolute",
-                  bottom: "0",
-                  right: "0",
-                }}
-              >
-                <ArrowForwardIcon
-                  className="icon"
-                  sx={{ color: "white", fontSize: "15px" }}
-                />
-              </Button>
-            </Button>
+              <ArrowForwardIcon
+                className="icon"
+                sx={{ color: "white", fontSize: "15px" }}
+              />
+            </div>
           </div>
         ))}
       </div>

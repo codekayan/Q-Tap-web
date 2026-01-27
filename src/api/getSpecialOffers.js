@@ -3,6 +3,10 @@ import axios from "axios";
 
 export const getSpecialOffers = async (branchId) => {
     try {
+        // If no branchId, return empty array
+        if (!branchId) {
+            return [];
+        }
 
         const response = await axios.get(`${BASE_URL}meals_special_offers`, {
             headers: {
@@ -13,18 +17,7 @@ export const getSpecialOffers = async (branchId) => {
             }
         });
 
-        // const response = await axios({
-        //     method: 'get',
-        //     url: `${BASE_URL}${endPoint}`,
-        //     data: {
-        //         brunch_id: branchId,
-        //     },
-        //     headers: {
-
-        //     },
-        // });
-
-        if (response.data) {
+        if (response.data && response.data.length > 0) {
             const formattedOffers = response.data.map(offer => ({
                 id: offer.id,
                 item: offer.meals_id,
@@ -38,8 +31,13 @@ export const getSpecialOffers = async (branchId) => {
             }));
             return (formattedOffers);
         }
+        
+        return [];
     } catch (error) {
-        console.error('Error fetching discounts:', error);
-        return null
+        // Log the error but don't throw - allow the app to continue without special offers
+        if (error.response?.status !== 401) {
+            console.error('Error fetching special offers:', error.message);
+        }
+        return [];
     }
 };
