@@ -17,7 +17,7 @@ import {
   isAllItemComeFromSameBranch,
   itemPriceDetailsCalculation,
 } from "@/utils/utils";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "@/i18n/navigation";
 import { toast } from "react-toastify";
 import { useSpecialOffers } from "@/hooks/useSpecialOffers";
 import { useShops } from "@/hooks/useShops";

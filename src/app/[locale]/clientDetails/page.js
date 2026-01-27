@@ -23,7 +23,7 @@ import TableBarOutlinedIcon from "@mui/icons-material/TableBarOutlined";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import MapView from "./map";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "@/i18n/navigation";
 import { toast } from "react-toastify";
 import { useShops } from "@/hooks/useShops";
 import { apiCheckDiscountCode } from "@/api/checkDiscountCode";

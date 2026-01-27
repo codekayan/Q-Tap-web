@@ -7,7 +7,7 @@ import { Link } from "@/i18n/navigation"
 import CheckIcon from '@mui/icons-material/Check';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslations } from 'next-intl';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from '@/i18n/navigation';
 import { BASE_URL_IMAGE } from '@/utils/constants';
 import { useShops } from '@/hooks/useShops';
 import { useSelectShopAndBranchData } from '@/hooks/useSelectShopAndBranchData';

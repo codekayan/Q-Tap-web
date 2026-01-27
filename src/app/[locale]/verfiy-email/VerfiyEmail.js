@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { AllChatForm } from '../Chat/AllChatForm.js';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from "react-toastify";

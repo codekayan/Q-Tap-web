@@ -24,7 +24,7 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { AllChatForm } from "../Chat/AllChatForm.js";
 import { useLocale, useTranslations } from "next-intl";
 import { BASE_URL } from "@/utils/constants.js";

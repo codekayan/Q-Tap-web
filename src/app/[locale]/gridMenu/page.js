@@ -10,7 +10,7 @@ import { Categories } from './Categories';
 import { Content } from './Content';
 import { useTranslations } from 'next-intl';
 import { BASE_URL_IMAGE } from '@/utils/constants';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from '@/i18n/navigation';
 import { handleSpecialOfferClick } from '../categories/page';
 import MyOffersSlider from '../categories/MyOffersSlider';
 import { Item } from './Item';

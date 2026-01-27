@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import {
   Box,
   Typography,
@@ -44,6 +44,9 @@ const page = () => {
   const router = useRouter();
 
   const searchParams = useSearchParams();
+  
+  const { shopId, branchId, tableId, error: paramError } = useQueryParamsRedirect();
+  
   const { data: offers, isLoading: isLoadingOffers } =
     useSpecialOffers(branchId);
   const { data: shops, isLoading, isError, error, refetch } = useShops();
@@ -52,6 +55,7 @@ const page = () => {
     shopImg,
     currentBranch,
     error: SelectedBranchError,
+    isLoading: isBranchLoading,
   } = useSelectShopAndBranchData(shops, shopId, branchId);
 
   useEffect(() => {
@@ -77,7 +81,7 @@ const page = () => {
     setInputQuery(e.target.value);
   };
 
-  if (isLoading) return <div>Loading ...</div>;
+  if (isLoading || isBranchLoading) return <div>Loading ...</div>;
 
   if (isError) return <div>Error: {error.message}</div>;
 

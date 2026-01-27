@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import './custom-css.css'
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { BASE_URL_IMAGE } from '@/utils/constants';
 import { useShops } from '@/hooks/useShops';

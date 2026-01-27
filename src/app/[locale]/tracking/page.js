@@ -13,7 +13,7 @@ import PaymentModal from './PaymentModal';
 import { useTranslations } from 'next-intl';
 import Pusher from 'pusher-js';
 import { formateDate } from '@/utils/utils';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { toast } from 'react-toastify';
 
 
