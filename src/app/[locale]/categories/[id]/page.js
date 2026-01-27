@@ -111,7 +111,7 @@ const page = ({ params }) => {
               color: 'white',
               textShadow: '2px 0px #E57C00'
             }}>
-            {t(data?.title)}
+            {data?.title}
           </Typography>
         </Box>
       </Box>

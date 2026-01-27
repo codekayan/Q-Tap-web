@@ -114,7 +114,7 @@ const page = () => {
                     <Typography>{t("yourCartIsEmpty")}</Typography>
                 ) : (
                     meals?.map((item, index) => (
-                        <>
+                        <React.Fragment key={item.id || index}> {/* Add key here */}
                             <Box
                                 key={index}
                                 sx={{
@@ -172,7 +172,7 @@ const page = () => {
                                         }}>
                                             {item.quantity} </Typography>
 
-                                        {item.quantity === 1 ? <Trash2 onClick={() => handleMinusItem(item)} size={12} className="text-red-500 cursor-pointer" style={{width:"15px", height:"15px",padding:'5px' ,cursor:"pointer", background:'red',borderRadius:"50%"}} />
+                                        {item.quantity === 1 ? <Trash2 onClick={() => handleMinusItem(item)} size={12} className="text-red-500 cursor-pointer" style={{ width: "15px", height: "15px", padding: '5px', cursor: "pointer", background: 'red', borderRadius: "50%" }} />
                                             : <RemoveCircleOutlinedIcon
                                                 onClick={() => handleMinusItem(item)}
                                                 sx={{ fontSize: "30px", color: "#44404D", cursor: "pointer" }}
@@ -188,9 +188,10 @@ const page = () => {
                                     </Box>
                                 </Box>
                             </Box>
-                        </>
+                        </React.Fragment>
                     ))
                 )}
+
             </Box >
 
 

@@ -34,7 +34,7 @@ const Page = ({ params }) => {
 
   const unwrappedParams = React.use(params);
   const { id } = unwrappedParams;
-  
+
   const [mealData, setMealData] = useState(null);
   const addItemToCart = useCartStore((state) => state.addItemToCart);
 
@@ -44,7 +44,7 @@ const Page = ({ params }) => {
   const branchId = searchParams.get("branchId");
   const catId = searchParams.get("catId");
   const specialID = searchParams.get("special") || null;
-  
+
   const router = useRouter();
 
   // ... rest of your code
@@ -164,8 +164,8 @@ const Page = ({ params }) => {
           selectedSize === "L"
             ? mealData.price_large
             : selectedSize === "M"
-            ? mealData.price_medium
-            : mealData.price_small;
+              ? mealData.price_medium
+              : mealData.price_small;
         meal = createMeal({
           id: mealData.id,
           restaurantId: Number(shopId),
@@ -465,19 +465,13 @@ const Page = ({ params }) => {
               {!specialID &&
                 sizes.map((size, index) => {
                   return (
-                    <>
+                    <React.Fragment key={size}> {/* Fixed: Added key to Fragment */}
                       {/* <Typography>
-                                            {
-                                                (size === "S") ? mealData?.price_small : <></>
-                                            }
-                                            {
-                                                (size === "M") ? mealData?.price_medium : <></>
-                                            }
-                                            {
-                                                (size === "L") ? mealData?.price_large : <></>
-                                            }
-                                            EGP
-                                        </Typography> */}
+              {(size === "S") ? mealData?.price_small : <></>}
+              {(size === "M") ? mealData?.price_medium : <></>}
+              {(size === "L") ? mealData?.price_large : <></>}
+              EGP
+            </Typography> */}
                       <Button
                         key={size}
                         onClick={() => {
@@ -513,13 +507,13 @@ const Page = ({ params }) => {
                           }}
                         />
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
             </Box>{" "}
             {/* size */}
             {/* {!specialID && mealData?.discount ? <Typography>discount {mealData?.discount} %</Typography> : <></>}
-                        {!specialID && mealData?.Tax ? <Typography>Tax {mealData?.Tax} %</Typography> : <></>} */}
+  {!specialID && mealData?.Tax ? <Typography>Tax {mealData?.Tax} %</Typography> : <></>} */}
             <Box sx={{ marginTop: "15px" }}>
               <Typography
                 variant="h6"
@@ -679,27 +673,27 @@ const Page = ({ params }) => {
 
               <Box display="flex" flexWrap="wrap" gap={1}>
                 {/* {ingrediants.map((option, index) => (
-                            <Button key={index}
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    width: "23%",
-                                    height: "25px",
-                                    backgroundColor: "#302E3B",
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "20px",
-                                    padding: "3px 10px",
-                                    "&:hover": {
-                                        backgroundColor: "#302E3B",
-                                    },
-                                }}
-                            >
-                                <Typography variant="body2" sx={{ fontSize: "8px", textTransform: "capitalize" }}>
-                                    {option.name}
-                                </Typography>
-                            </Button>
-                        ))} */}
+        <Button key={index}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            width: "23%",
+            height: "25px",
+            backgroundColor: "#302E3B",
+            color: "white",
+            border: "none",
+            borderRadius: "20px",
+            padding: "3px 10px",
+            "&:hover": {
+              backgroundColor: "#302E3B",
+            },
+          }}
+        >
+          <Typography variant="body2" sx={{ fontSize: "8px", textTransform: "capitalize" }}>
+            {option.name}
+          </Typography>
+        </Button>
+      ))} */}
                 {mealData?.Ingredients}
               </Box>
             </Box>{" "}

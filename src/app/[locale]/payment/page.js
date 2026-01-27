@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense, lazy } from "react";
 import {
   Box,
   Typography,
@@ -9,20 +9,20 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Header } from "./Header";
-import { useTranslations } from "next-intl"; // Fixed: from "next-intl", not "use-intl"
+import { useTranslations } from "next-intl";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useRouter } from "@/i18n/navigation"; // Keep useRouter from i18n
-import { useSearchParams } from "next/navigation"; // Fixed: from next/navigation
-import MapView from "../clientDetails/map";
+import { useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { useReactToPrint } from "react-to-print";
-import html2pdf from "html2pdf.js";
+// Remove this import: import html2pdf from "html2pdf.js";
 import { BASE_URL } from "@/utils/constants";
 import { useCartStore } from "@/store/cartStore";
 
-// If you need Suspense for useSearchParams
-import { Suspense } from "react";
-
+// Dynamically import MapView with no SSR
+const MapView = lazy(() => import("../clientDetails/map").then(mod => ({ default: mod.default })), {
+  ssr: false
+});
 
 const page = () => {
   const t = useTranslations();
@@ -36,7 +36,10 @@ const page = () => {
     removeAfterPrint: true,
   });
 
-  const handleDownloadPDF = (fileName) => {
+  const handleDownloadPDF = async (fileName) => {
+    // Dynamically import html2pdf only on client side
+    const html2pdf = (await import("html2pdf.js")).default;
+    
     const element = pageRef.current;
     const opt = {
       margin: 0.5,
@@ -48,6 +51,7 @@ const page = () => {
 
     html2pdf().set(opt).from(element).save();
   };
+  
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState(null);
   const cartItems = useCartStore((state) => state.meals);
@@ -258,9 +262,8 @@ const page = () => {
           </Typography>
           {cartItems &&
             cartItems.map((item, index) => (
-              <>
+              <React.Fragment key={item.id || index}>
                 <Box
-                  key={index}
                   display={"flex"}
                   justifyContent={"space-between"}
                 >
@@ -287,14 +290,14 @@ const page = () => {
                       {/* <span style={{ color: "#ef7d00" }}>Options | </span> */}
                       {item.selectedOptions && item.selectedOptions.length > 0
                         ? item.selectedOptions
-                            .map((option) => option.name)
-                            .join(", ")
+                          .map((option) => option.name)
+                          .join(", ")
                         : t("noOptionsSelected")}{" "}
                       ,
                       {item.selectedExtra && item.selectedExtra.length > 0
                         ? item.selectedExtra
-                            .map((extra) => extra.name)
-                            .join(", ")
+                          .map((extra) => extra.name)
+                          .join(", ")
                         : t("noExtraSelected")}
                     </Typography>
                   </Box>
@@ -358,7 +361,7 @@ const page = () => {
                 <Divider
                   sx={{ margin: "10px 0px", backgroundColor: "#44404D" }}
                 />
-              </>
+              </React.Fragment>
             ))}
           {formData ? (
             <>
@@ -421,24 +424,24 @@ const page = () => {
                     onClick={handleLocationClick}
                   >
                     <span
-                      class="icon-map-1"
+                      className="icon-map-1"
                       style={{ fontSize: "15px", marginRight: "5px" }}
                     >
-                      <span class="path1"></span>
-                      <span class="path2"></span>
-                      <span class="path3"></span>
-                      <span class="path4"></span>
-                      <span class="path5"></span>
-                      <span class="path6"></span>
-                      <span class="path7"></span>
-                      <span class="path8"></span>
-                      <span class="path9"></span>
-                      <span class="path10"></span>
-                      <span class="path11"></span>
-                      <span class="path12"></span>
-                      <span class="path13"></span>
-                      <span class="path14"></span>
-                      <span class="path15"></span>
+                      <span className="path1"></span>
+                      <span className="path2"></span>
+                      <span className="path3"></span>
+                      <span className="path4"></span>
+                      <span className="path5"></span>
+                      <span className="path6"></span>
+                      <span className="path7"></span>
+                      <span className="path8"></span>
+                      <span className="path9"></span>
+                      <span className="path10"></span>
+                      <span className="path11"></span>
+                      <span className="path12"></span>
+                      <span className="path13"></span>
+                      <span className="path14"></span>
+                      <span className="path15"></span>
                     </span>
                     {t("location")}
                   </Button>
@@ -446,15 +449,18 @@ const page = () => {
                   <></>
                 )}
                 {isMapOpen && (
-                  <MapView
-                    currentPos={
-                      position
-                        ? [Number(position[0]), Number(position[1])]
-                        : null
-                    }
-                    setUserPosition={setPosition}
-                  />
+                  <Suspense fallback={<div>Loading map...</div>}>
+                    <MapView
+                      currentPos={
+                        position
+                          ? [Number(position[0]), Number(position[1])]
+                          : null
+                      }
+                      setUserPosition={setPosition}
+                    />
+                  </Suspense>
                 )}
+
               </Box>
               <Divider
                 sx={{ margin: "10px 0px", backgroundColor: "#44404D" }}
@@ -471,9 +477,9 @@ const page = () => {
                     {t("paymentMethod")}
                   </Typography>
                   {/* <Typography>
-                                        <span style={{ color: "#AAAAAA", fontSize: "11px", borderBottom: "1px solid #AAAAAA" }}>
-                                            {t("change")}</span>
-                                    </Typography> */}
+            <span style={{ color: "#AAAAAA", fontSize: "11px", borderBottom: "1px solid #AAAAAA" }}>
+              {t("change")}</span>
+          </Typography> */}
                   <PaymentMethodSelector
                     setSelectedMethod={setSelectedMethod}
                   />
@@ -486,23 +492,23 @@ const page = () => {
                   alignItems={"center"}
                 >
                   <span
-                    class="icon-wallet"
+                    className="icon-wallet"
                     style={{ fontSize: "20px", marginRight: "6px" }}
                   >
-                    <span class="path1"></span>
-                    <span class="path2"></span>
-                    <span class="path3"></span>
-                    <span class="path4"></span>
-                    <span class="path5"></span>
-                    <span class="path6"></span>
-                    <span class="path7"></span>
-                    <span class="path8"></span>
-                    <span class="path9"></span>
-                    <span class="path10"></span>
-                    <span class="path11"></span>
-                    <span class="path12"></span>
+                    <span className="path1"></span>
+                    <span className="path2"></span>
+                    <span className="path3"></span>
+                    <span className="path4"></span>
+                    <span className="path5"></span>
+                    <span className="path6"></span>
+                    <span className="path7"></span>
+                    <span className="path8"></span>
+                    <span className="path9"></span>
+                    <span className="path10"></span>
+                    <span className="path11"></span>
+                    <span className="path12"></span>
                   </span>
-                  {t(selectedMethod)}
+                  {selectedMethod}
                 </Typography>
               </Box>
 
@@ -641,7 +647,7 @@ const page = () => {
             }}
           >
             <span
-              class="icon-close"
+              className="icon-close"
               style={{ fontSize: "12px", marginRight: "5px" }}
             ></span>
             {t("cancel")}
@@ -659,7 +665,7 @@ const page = () => {
             }}
           >
             <span
-              class="icon-edit"
+              className="icon-edit"
               style={{ fontSize: "18px", color: "#009444", marginRight: "5px" }}
             ></span>
             {t("edit")}
