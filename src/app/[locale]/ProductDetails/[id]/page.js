@@ -17,7 +17,8 @@ import {
   isAllItemComeFromSameBranch,
   itemPriceDetailsCalculation,
 } from "@/utils/utils";
-import { useRouter, useSearchParams } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation"; // Keep useRouter from i18n
+import { useSearchParams } from "next/navigation"; // Import from next/navigation
 import { toast } from "react-toastify";
 import { useSpecialOffers } from "@/hooks/useSpecialOffers";
 import { useShops } from "@/hooks/useShops";
@@ -27,25 +28,26 @@ import { createMeal, createSpecialOfferMeal } from "@/utils/mealsFactory";
 
 const sizes = ["S", "M", "L"];
 
-const page = ({ params }) => {
+const Page = ({ params }) => {
   const locale = useLocale();
   const t = useTranslations();
 
-  const { id } = params; //mealid
-  // const [shopData, setShopData] = useState(null)
+  const unwrappedParams = React.use(params);
+  const { id } = unwrappedParams;
+  
   const [mealData, setMealData] = useState(null);
-
-  // const [isLoading, setIsLoading] = useState(true)
-  /*  */
   const addItemToCart = useCartStore((state) => state.addItemToCart);
 
+  // This will now work correctly
   const searchParams = useSearchParams();
   const shopId = searchParams.get("shopId");
   const branchId = searchParams.get("branchId");
   const catId = searchParams.get("catId");
   const specialID = searchParams.get("special") || null;
+  
   const router = useRouter();
 
+  // ... rest of your code
   const { data: offersData, isLoading: isLoadingOffers } =
     useSpecialOffers(branchId);
 
@@ -795,4 +797,4 @@ const page = ({ params }) => {
   );
 };
 
-export default page;
+export default Page;

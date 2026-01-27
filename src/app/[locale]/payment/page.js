@@ -9,18 +9,20 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Header } from "./Header";
-import { Link } from "@/i18n/navigation";
-import { getCartItems } from "../ProductDetails/cartUtils";
-import { useTranslations } from "use-intl";
+import { useTranslations } from "next-intl"; // Fixed: from "next-intl", not "use-intl"
 import axios from "axios";
-import { calculateOrderPriceDetailed } from "@/utils/utils";
 import { toast } from "react-toastify";
-import { useRouter, useSearchParams } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation"; // Keep useRouter from i18n
+import { useSearchParams } from "next/navigation"; // Fixed: from next/navigation
 import MapView from "../clientDetails/map";
 import { useReactToPrint } from "react-to-print";
 import html2pdf from "html2pdf.js";
 import { BASE_URL } from "@/utils/constants";
 import { useCartStore } from "@/store/cartStore";
+
+// If you need Suspense for useSearchParams
+import { Suspense } from "react";
+
 
 const page = () => {
   const t = useTranslations();

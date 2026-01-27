@@ -16,7 +16,8 @@ import { useQueryParamsRedirect } from '@/hooks/useShopSearchParam';
 
 const page = ({ params }) => {
   const t = useTranslations()
-  const { id } = params;
+  const unwrappedParams = React.use(params);
+  const { id } = unwrappedParams;
   // const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState(null)
   // const [shopData, setShopData] = useState([])
